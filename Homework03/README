@@ -1,0 +1,20 @@
+Homework 3.
+Created by Will Elswick 9/23/2013 using gedit.
+
+In this repository are the 2 programs I have written for homework 2.
+There is one in each of the two repositories. Use the 'make' command
+to create the executable in each folder.
+
+Part01
+--------
+Usage: %s <sensor 1 low threshold> <sensor 1 high threshold> <sensor 2 low threshold> <sensor 2 high threshold>
+This program takes the values for the high and low threshold registers in the TMP101 sensors.
+Then, when either device throws an alarm, the program will print out the temperature they are reading
+
+Part02
+--------
+Usage: %s <start x> <start y>
+This program takes the start position for the cursor on the etch a sketch. The program will then display the
+board on the console and the LED matrix and can be controlled with the 4 buttons selected by the #defines in
+the program. The screen can be cleared or erase mode can be toggled by the last two GPIO pins. These
+pins I have hooked up to the alarm pins of my TMP101 sensors and are triggered in the same manner as Part01.
