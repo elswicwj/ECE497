@@ -1,7 +1,9 @@
+
     var socket;
     var firstconnect = true,
         i2cNum  = "0x70",
 	disp = [];
+	var save_string;
 
 // Create a matrix of LEDs inside the <table> tags.
 var matrixData;
@@ -86,6 +88,21 @@ function LEDclick(i, j) {
       socket.disconnect();
     }
 
+	function save() {
+		save_string = "";
+		for(var i = 0; i < disp.length; i++ ) {
+			save_string = save_string + disp[i].toString(16) + " ";
+		}
+		save_string = save_string.substring(0, save_string.length-1);
+		//status_update("Saving " + save_string);
+	}
+	
+	function load() {
+		var load_string = save_string;
+		status_update("Loading " + load_string);
+		//matrix(load_string);
+	}
+
     // When new data arrives, convert it and display it.
     // data is a string of 16 values, each a pair of hex digits.
     function matrix(data) {
@@ -93,7 +110,7 @@ function LEDclick(i, j) {
                 //status_update("i2c: " + data);
         // Make data an array, each entry is a pair of digits
         data = data.split(" ");
-                status_update("data: " + data);
+                //status_update("data: " + data);
         // Every other pair of digits are Green. The others are red.
         // Ignore the red.
         // Convert from hex.
@@ -116,6 +133,10 @@ function LEDclick(i, j) {
                     $('#id' + i/2 + '_' + j).addClass('on_yellow');
                 } 
             }
+            socket.emit('i2cset', {i2cNum: i2cNum, i: i, 
+			     disp: '0x'+disp[i].toString(16)});
+			socket.emit('i2cset', {i2cNum: i2cNum, i: i+1, 
+				 disp: '0x'+disp[i+1].toString(16)});
         }
     }
 
