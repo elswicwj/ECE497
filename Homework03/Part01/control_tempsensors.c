@@ -11,6 +11,10 @@ void signal_handler(int sig) {
 	printf("\nCtrl-C pressed--exiting...\n");
 }
 
+float fahr_to_celsius(float celsius) {
+	return (celsius - 32) * 0.55555;
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	signal(SIGINT, signal_handler);
@@ -40,11 +44,13 @@ int main(int argc, char **argv, char **envp)
 		gpio_fd[i] = gpio_fd_open(alerts[i], O_RDONLY);
 		
 		char set_low[100];
-		sprintf(set_low, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i], THRESHOLD_LOW_REGISTER, argv[register_counter++]);
+		int low_thresh = (int) fahr_to_celsius(atoi(argv[register_counter++]));
+		sprintf(set_low, "i2cset -y %d %d %d %d b", BUS, sensor_addresses[i], THRESHOLD_LOW_REGISTER, low_thresh);
 		system(set_low);
 		
 		char set_high[100];
-		sprintf(set_high, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i], THRESHOLD_HIGH_REGISTER, argv[register_counter++]);
+		int high_thresh = (int) fahr_to_celsius(atoi(argv[register_counter++]));
+		sprintf(set_high, "i2cset -y %d %d %d %d b", BUS, sensor_addresses[i], THRESHOLD_HIGH_REGISTER, high_thresh);
 		system(set_high);
 	}
 

@@ -25,3 +25,5 @@
 int keepgoing = 1;
 
 void signal_handler(int sig);
+
+float fahr_to_celsius(float celsius);
