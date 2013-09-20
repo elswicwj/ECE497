@@ -4,9 +4,9 @@ TOOLS_CFLAGS	:= -Wstrict-prototypes -Wshadow -Wpointer-arith -Wcast-qual \
 #
 # Programs
 #
-all:	control_tempsensors
+all:	etch_matrix
 
-control_tempsensors:	control_tempsensors.o gpio-utils.o
+etch_matrix:	etch_matrix.o gpio-utils.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 
@@ -18,4 +18,4 @@ control_tempsensors:	control_tempsensors.o gpio-utils.o
 	$(CC) $(CFLAGS) $(TOOLS_CFLAGS) -c $< -o $@
 
 clean:
-	rm control_tempsensors.o gpio-utils.o
+	rm etch_matrix.o gpio-utils.o

@@ -5,7 +5,7 @@
 //  As a bonus, I've added that the c key clears the screen (saving
 //  your position) and r toggles drawing/erasing.
 
-#include "etch-external.h"
+#include "etch_matrix.h"
 
 void signal_handler(int sig) {
 	printf("Ctrl-C pressed, cleaning up and exiting...\n");
@@ -58,15 +58,15 @@ int main(int argc, char **argv, char **envp) {
 	keepgoing = 1;
 	char cursor_char = 'X';
 	
-	if(argc != 5) {
-		printf("Usage: %s <board width> <board height> <start x> <start y>\n", argv[0]);
+	if(argc != 3) {
+		printf("Usage: %s <start x> <start y>\n", argv[0]);
 		exit(-1);
 	}
 	
 	//Set up board
 	int i, j;
-	int size_x = atoi(argv[1]);
-	int size_y = atoi(argv[2]);
+	int size_x = LED_X_DIM;
+	int size_y = LED_Y_DIM;
 	char** board;
 	//Malloc memory for the board
 	board = (char**) malloc(size_x * sizeof(char*));
@@ -74,7 +74,7 @@ int main(int argc, char **argv, char **envp) {
 		board[i] = (char*) malloc(size_y * sizeof(char));
 		memset(board[i], ' ', size_y * sizeof(char));
 	}
-	int pos[2] = {atoi(argv[3]), atoi(argv[4])};
+	int pos[2] = {atoi(argv[1]), atoi(argv[2])};
 	
 	//Set up GPIO pins and their interrupts
 	int buttons[] = BUTTON_GPIO_PINS;
