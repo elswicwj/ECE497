@@ -78,21 +78,25 @@ void move(int* pos, char dir, int max_x, int max_y) {
 //Draws the array it's given
 void draw_board(int file, char** board, int size_x, int size_y) {
 	int i, j;
-	static __u16 frown_bmp[]=
-	{0x3c00, 0x4200, 0xa900, 0x8500, 0x8500, 0xa900, 0x4200, 0x3c00};
+	__u16 led_board[]=
+	{0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
 	system("clear");
 	for(j = -1; j < size_y; j++) {
 		char line[size_x + 3];
 		line[0] = '|';
 		for(i = 0; i < size_x; i++) {
 			if(j == -1) line[i + 1] = '_';
-			else line[i + 1] = board[i][j];
+			else {
+				line[i + 1] = board[i][j];
+				if(line[i + 1] == 'O') led_board[j]|=(0x0001<<(i+8));
+				else if(line[i + 1] == 'X') led_board[j]|=(0x0001<<i);
+			}
 		}
 		line[++i] = '\n';
 		line[++i] = '\0';
 		printf(line);
 	}
-	write_block(file, frown_bmp);
+	write_block(file, led_board);
 }
 
 //Clears the board
