@@ -7,6 +7,55 @@
 
 #include "etch_matrix.h"
 
+static void help(void) __attribute__ ((noreturn));
+
+static void help(void) {
+	fprintf(stderr, "Usage: matrixLEDi2c (hardwired to bus 3, address 0x70)\n");
+	exit(1);
+}
+
+static int check_funcs(int file) {
+	unsigned long funcs;
+
+	/* check adapter functionality */
+	if (ioctl(file, I2C_FUNCS, &funcs) < 0) {
+		fprintf(stderr, "Error: Could not get the adapter "
+			"functionality matrix: %s\n", strerror(errno));
+		return -1;
+	}
+
+	if (!(funcs & I2C_FUNC_SMBUS_WRITE_BYTE)) {
+		fprintf(stderr, MISSING_FUNC_FMT, "SMBus send byte");
+		return -1;
+	}
+	return 0;
+}
+
+// Writes block of data to the display
+static int write_block(int file, __u16 *data) {
+	int res;
+#ifdef BICOLOR
+	res = i2c_smbus_write_i2c_block_data(file, 0x00, 16, 
+		(__u8 *)data);
+	return res;
+#else
+/*
+ * For some reason the single color display is rotated one column, 
+ * so pre-unrotate the data.
+ */
+	int i;
+	__u16 block[I2C_SMBUS_BLOCK_MAX];
+//	printf("rotating\n");
+	for(i=0; i<8; i++) {
+		block[i] = (data[i]&0xfe) >> 1 | 
+			   (data[i]&0x01) << 7;
+	}
+	res = i2c_smbus_write_i2c_block_data(file, 0x00, 16, 
+		(__u8 *)block);
+	return res;
+#endif
+}
+
 void signal_handler(int sig) {
 	printf("Ctrl-C pressed, cleaning up and exiting...\n");
 	keepgoing = 0;
@@ -27,8 +76,10 @@ void move(int* pos, char dir, int max_x, int max_y) {
 }
 
 //Draws the array it's given
-void draw_board(char** board, int size_x, int size_y) {
+void draw_board(int file, char** board, int size_x, int size_y) {
 	int i, j;
+	static __u16 frown_bmp[]=
+	{0x3c00, 0x4200, 0xa900, 0x8500, 0x8500, 0xa900, 0x4200, 0x3c00};
 	system("clear");
 	for(j = -1; j < size_y; j++) {
 		char line[size_x + 3];
@@ -41,6 +92,7 @@ void draw_board(char** board, int size_x, int size_y) {
 		line[++i] = '\0';
 		printf(line);
 	}
+	write_block(file, frown_bmp);
 }
 
 //Clears the board
@@ -62,6 +114,33 @@ int main(int argc, char **argv, char **envp) {
 		printf("Usage: %s <start x> <start y>\n", argv[0]);
 		exit(-1);
 	}
+	
+	//Set up LED matrix
+	int res, i2cbus, address, file;
+	char filename[20];
+	int force = 0;
+
+	i2cbus = lookup_i2c_bus("1");
+	printf("i2cbus = %d\n", i2cbus);
+	if (i2cbus < 0)
+		help();
+
+	address = parse_i2c_address("0x70");
+	printf("address = 0x%2x\n", address);
+	if (address < 0)
+		help();
+
+	file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+//	printf("file = %d\n", file);
+	if (file < 0
+	 || check_funcs(file)
+	 || set_slave_addr(file, address, force))
+		exit(1);
+		
+	// Check the return value on these if there is trouble
+	i2c_smbus_write_byte(file, 0x21); // Start oscillator (p10)
+	i2c_smbus_write_byte(file, 0x81); // Disp on, blink off (p11)
+	i2c_smbus_write_byte(file, 0xe7); // Full brightness (page 15)
 	
 	//Set up board
 	int i, j;
@@ -96,7 +175,7 @@ int main(int argc, char **argv, char **envp) {
 	//Wait for inputs and draw after each input. This scanf can later be
 	// replaced with poll() when we want input from the buttons.
 	board[pos[0]][pos[1]] = 'O';
-	draw_board(board, size_x, size_y);
+	draw_board(file, board, size_x, size_y);
 	while(keepgoing) {
 		char dir;
 		//Reset GPIO interrupts
@@ -139,7 +218,7 @@ int main(int argc, char **argv, char **envp) {
 					board[pos[0]][pos[1]] = cursor_char;
 					move(pos, dir, size_x, size_y);
 					board[pos[0]][pos[1]] = 'O';
-					draw_board(board, size_x, size_y);
+					draw_board(file, board, size_x, size_y);
 				}
 			}
 		}

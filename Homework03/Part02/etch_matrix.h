@@ -19,6 +19,7 @@
 
 #define LED_X_DIM 8
 #define LED_Y_DIM 8
+#define BICOLOR
 
 #define TIMEOUT -1
 #define BUTTON_GPIO_PINS {60, 50, 51, 15, 30, 31}
@@ -34,7 +35,7 @@ void signal_handler(int sig);
 void move(int* pos, char dir, int max_x, int max_y);
 
 //Draws the array it's given
-void draw_board(char** board, int size_x, int size_y);
+void draw_board(int file, char** board, int size_x, int size_y);
 
 //Clears the board
 void clear_board(char** board, int size_x, int size_y);

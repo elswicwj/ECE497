@@ -6,7 +6,7 @@ TOOLS_CFLAGS	:= -Wstrict-prototypes -Wshadow -Wpointer-arith -Wcast-qual \
 #
 all:	etch_matrix
 
-etch_matrix:	etch_matrix.o gpio-utils.o
+etch_matrix:	etch_matrix.o gpio-utils.o i2cbusses.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 
