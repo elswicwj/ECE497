@@ -25,7 +25,7 @@
 #define BUTTON_GPIO_PINS {60, 50, 51, 15, 30, 31}
 //What state should the GPIO pin be when the button is pressed? i.e.
 // i.e. is there a pull up or a pull down resistor?
-#define BUTTON_ACTIVE_EDGES {0, 1, 1, 0, 0, 0} 
+#define BUTTON_ACTIVE_EDGES {0, 0, 0, 0, 0, 0} 
 
 #define BUS 1
 #define SENSOR_ADDRESSES {73, 74}

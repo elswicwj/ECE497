@@ -5,6 +5,9 @@ In this repository are the 2 programs I have written for homework 2.
 There is one in each of the two repositories. Use the 'make' command
 to create the executable in each folder.
 
+I also created a device .dts file to use with the pins I selected that configures
+all the pins to have pull-down resistors. This is included in the 'device tree' directory.
+
 Part01
 --------
 Usage: %s <sensor 1 low threshold> <sensor 1 high threshold> <sensor 2 low threshold> <sensor 2 high threshold>
