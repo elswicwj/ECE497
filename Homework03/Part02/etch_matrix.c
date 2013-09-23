@@ -114,8 +114,8 @@ int main(int argc, char **argv, char **envp) {
 	keepgoing = 1;
 	char cursor_char = 'X';
 	
-	if(argc != 3) {
-		printf("Usage: %s <start x> <start y>\n", argv[0]);
+	if(argc != 5) {
+		printf("Usage: %s <start x> <start y> <temp threshold low> <temp threshold high>\n", argv[0]);
 		exit(-1);
 	}
 	
@@ -163,6 +163,7 @@ int main(int argc, char **argv, char **envp) {
 	int buttons[] = BUTTON_GPIO_PINS;
 	int button_size = sizeof(buttons)/sizeof(buttons[0]);
 	int button_active_edges[] = BUTTON_ACTIVE_EDGES;
+	int sensor_addresses[] = SENSOR_ADDRESSES;
 
 	struct pollfd fdset[button_size];
 	int nfds = button_size;	
@@ -174,6 +175,16 @@ int main(int argc, char **argv, char **envp) {
 		gpio_set_dir(buttons[i], "in");
 		gpio_set_edge(buttons[i], button_active_edges[i] ? "rising" : "falling");
 		gpio_fd[i] = gpio_fd_open(buttons[i], O_RDONLY);
+		
+		if( i > button_size - 3) {
+			char set_low[100];
+			sprintf(set_low, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i-4], THRESHOLD_LOW_REGISTER, argv[3]);
+			system(set_low);
+			printf(set_low);
+			char set_high[100];
+			sprintf(set_high, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i-4], THRESHOLD_HIGH_REGISTER, argv[4]);
+			system(set_high);
+		}
 	}
 	
 	//Wait for inputs and draw after each input. This scanf can later be

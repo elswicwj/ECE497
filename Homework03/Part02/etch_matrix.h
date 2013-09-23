@@ -27,6 +27,11 @@
 // i.e. is there a pull up or a pull down resistor?
 #define BUTTON_ACTIVE_EDGES {0, 1, 1, 0, 0, 0} 
 
+#define BUS 1
+#define SENSOR_ADDRESSES {73, 74}
+#define THRESHOLD_LOW_REGISTER 2
+#define THRESHOLD_HIGH_REGISTER 3
+
 int keepgoing;
 
 void signal_handler(int sig);
