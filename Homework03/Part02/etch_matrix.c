@@ -141,6 +141,20 @@ int main(int argc, char **argv, char **envp) {
 	 || set_slave_addr(file, address, force))
 		exit(1);
 		
+	//Set up temp sensor
+	int temp_file;
+	address = parse_i2c_address("0x4a");
+	printf("address = 0x%2x\n", address);
+	if (address < 0)
+		help();
+
+	temp_file = open_i2c_dev(i2cbus, filename, sizeof(filename), 0);
+//	printf("file = %d\n", file);
+	if (temp_file < 0
+	 || check_funcs(temp_file)
+	 || set_slave_addr(temp_file, address, force))
+		exit(1);
+		
 	// Check the return value on these if there is trouble
 	i2c_smbus_write_byte(file, 0x21); // Start oscillator (p10)
 	i2c_smbus_write_byte(file, 0x81); // Disp on, blink off (p11)
@@ -180,7 +194,7 @@ int main(int argc, char **argv, char **envp) {
 			char set_low[100];
 			sprintf(set_low, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i-4], THRESHOLD_LOW_REGISTER, argv[3]);
 			system(set_low);
-			printf(set_low);
+
 			char set_high[100];
 			sprintf(set_high, "i2cset -y %d %d %d %s b", BUS, sensor_addresses[i-4], THRESHOLD_HIGH_REGISTER, argv[4]);
 			system(set_high);
@@ -191,6 +205,7 @@ int main(int argc, char **argv, char **envp) {
 	// replaced with poll() when we want input from the buttons.
 	board[pos[0]][pos[1]] = 'O';
 	draw_board(file, board, size_x, size_y);
+	res = i2c_smbus_write_byte(file, 0xe0);
 	while(keepgoing) {
 		char dir;
 		//Reset GPIO interrupts
@@ -201,7 +216,7 @@ int main(int argc, char **argv, char **envp) {
 		}
 		
 		//Poll interrupts (this replaced the scanf!)
-		poll(fdset, nfds, TIMEOUT);
+		poll(fdset, nfds, 100);
 		
 		usleep(2000); //Debounce the buttons
 		
@@ -237,6 +252,10 @@ int main(int argc, char **argv, char **envp) {
 				}
 			}
 		}
+	
+		int temp = i2c_smbus_read_byte_data(temp_file, 0);
+		//printf("%d", temp);
+	  res = i2c_smbus_write_byte(file, 0xe0 - atoi(argv[3]) + temp);
 	}
 
 	//Close up GPIOs
