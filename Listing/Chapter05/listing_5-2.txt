@@ -1,0 +1,8 @@
+This file is actually piggy.gzip.S. It looks nearly identical to the Piggy.S in the text, however there were multiple piggy.X.S files where X was a different form of compression. This gives us some options when building the kernel.
+
+	.section .piggydata,#alloc
+	.globl	input_data
+input_data:
+	.incbin	"arch/arm/boot/compressed/piggy.gzip"
+	.globl	input_data_end
+input_data_end:
