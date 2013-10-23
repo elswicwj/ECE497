@@ -1,0 +1,42 @@
+From bb76ecb9d173966d58c67775715f6f0e13cea49f Mon Sep 17 00:00:00 2001
+From: elswicwj <elswicwj@rose-hulman.edu>
+Date: Wed, 23 Oct 2013 16:59:56 -0400
+Subject: [PATCH] Added all needed files
+
+---
+ drivers/char/Kconfig  |    6 ++++++
+ drivers/char/Makefile |    1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index 72bedad..ad88a14 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -4,6 +4,12 @@
+ 
+ menu "Character devices"
+ 
++config EXAMPLES
++	bool "ENABLE EXAMPLES"
++	default m
++	help
++	  Enable compilation option for Embedded Linux Primer driver examples
++
+ source "drivers/tty/Kconfig"
+ 
+ config DEVKMEM
+diff --git a/drivers/char/Makefile b/drivers/char/Makefile
+index 7ff1d0d..917aa65 100644
+--- a/drivers/char/Makefile
++++ b/drivers/char/Makefile
+@@ -52,6 +52,7 @@ obj-$(CONFIG_TELCLOCK)		+= tlclk.o
+ obj-$(CONFIG_MWAVE)		+= mwave/
+ obj-$(CONFIG_AGP)		+= agp/
+ obj-$(CONFIG_PCMCIA)		+= pcmcia/
++obj-$(CONFIG_EXAMPLES)		+= examples/
+ 
+ obj-$(CONFIG_HANGCHECK_TIMER)	+= hangcheck-timer.o
+ obj-$(CONFIG_TCG_TPM)		+= tpm/
+-- 
+1.7.9.5
+
