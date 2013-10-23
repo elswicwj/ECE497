@@ -1,7 +1,7 @@
 From bb76ecb9d173966d58c67775715f6f0e13cea49f Mon Sep 17 00:00:00 2001
 From: elswicwj <elswicwj@rose-hulman.edu>
 Date: Wed, 23 Oct 2013 16:59:56 -0400
-Subject: [PATCH] Added all needed files
+Subject: [PATCH 1/2] Added all needed files
 
 ---
  drivers/char/Kconfig  |    6 ++++++
@@ -37,6 +37,32 @@ index 7ff1d0d..917aa65 100644
  
  obj-$(CONFIG_HANGCHECK_TIMER)	+= hangcheck-timer.o
  obj-$(CONFIG_TCG_TPM)		+= tpm/
+-- 
+1.7.9.5
+
+
+From ce8de1d245ad9c0d21e0b3420ae5d17a9af969cb Mon Sep 17 00:00:00 2001
+From: elswicwj <elswicwj@rose-hulman.edu>
+Date: Wed, 23 Oct 2013 18:00:52 -0400
+Subject: [PATCH 2/2] Fixed an error in Kconfig
+
+---
+ drivers/char/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index ad88a14..2d18d7f 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -5,7 +5,7 @@
+ menu "Character devices"
+ 
+ config EXAMPLES
+-	bool "ENABLE EXAMPLES"
++	tristate "ENABLE EXAMPLES"
+ 	default m
+ 	help
+ 	  Enable compilation option for Embedded Linux Primer driver examples
 -- 
 1.7.9.5
 
