@@ -72,7 +72,6 @@ function LEDclick(i, j) {
             { status_update("Reconnecting in " + nextRetry/1000 + " s"); });
         socket.on('reconnect_failed', function()
             { message("Reconnect Failed"); });
-
         socket.on('matrix',  matrix);
         // Read display for initial image.  Store in disp[]
         socket.emit("matrix", i2cNum);
@@ -94,13 +93,12 @@ function LEDclick(i, j) {
 			save_string = save_string + disp[i].toString(16) + " ";
 		}
 		save_string = save_string.substring(0, save_string.length-1);
-		//status_update("Saving " + save_string);
+		
+		socket.emit("save", {save_string: save_string});
 	}
 	
 	function load() {
-		var load_string = save_string;
-		status_update("Loading " + load_string);
-		//matrix(load_string);
+		socket.emit("load", "Send file");
 	}
 
     // When new data arrives, convert it and display it.
@@ -110,7 +108,7 @@ function LEDclick(i, j) {
                 //status_update("i2c: " + data);
         // Make data an array, each entry is a pair of digits
         data = data.split(" ");
-                //status_update("data: " + data);
+                status_update("data: " + data);
         // Every other pair of digits are Green. The others are red.
         // Ignore the red.
         // Convert from hex.

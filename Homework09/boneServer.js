@@ -176,6 +176,20 @@ io.sockets.on('connection', function (socket) {
 		params.disp); 
     });
     
+    socket.on('save', function(params) {
+		child_process.exec('echo ' + params.save_string + ' > tmp.txt'); 
+		console.log("saving");
+    });
+    
+    socket.on('load', function() {
+    	child_process.exec('cat tmp.txt', function(error, stdout, stderr) {
+    		console.log("loading " + stdout);
+    		socket.emit('matrix', stdout.substr(0,47));
+    		if(error) { console.log('error: ' + error); }
+            if(stderr) {console.log('stderr: ' + stderr); }
+    	})
+    });
+    
     socket.on('slider', function(slideNum, value) {
     // console.log('slider' + slideNum + " = " + value);
         b.analogWrite(pwm, value);
