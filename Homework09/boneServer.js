@@ -177,12 +177,12 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('save', function(params) {
-		child_process.exec('echo ' + params.save_string + ' > tmp.txt'); 
+		child_process.exec('echo ' + params.save_string + ' > tmp' + params.save_slot + '.txt'); 
 		console.log("saving");
     });
     
-    socket.on('load', function() {
-    	child_process.exec('cat tmp.txt', function(error, stdout, stderr) {
+    socket.on('load', function(params) {
+    	child_process.exec('cat tmp' + params.save_slot + '.txt', function(error, stdout, stderr) {
     		console.log("loading " + stdout);
     		socket.emit('matrix', stdout.substr(0,47));
     		if(error) { console.log('error: ' + error); }

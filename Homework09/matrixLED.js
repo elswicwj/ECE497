@@ -4,6 +4,9 @@
         i2cNum  = "0x70",
 	disp = [];
 	var save_string;
+	var save_slot=1;
+	var old_slot;
+	var animate_slot;
 
 // Create a matrix of LEDs inside the <table> tags.
 var matrixData;
@@ -17,6 +20,16 @@ for(var j=7; j>=0; j--) {
 	matrixData += '</tr>';
 }
 $('#matrixLED').append(matrixData);
+
+var saveSlotData="";
+for(var i=1; i<=3; i++) {
+    saveSlotData+='<option value="'+i+'" onclick="slotSelect('+i+')">Slot '+i+'</option>';
+}
+$('#saveSlot').append(saveSlotData);
+
+function slotSelect(i) {
+	save_slot=i;
+}
 
 // Send one column when LED is clicked.
 function LEDclick(i, j) {
@@ -87,18 +100,43 @@ function LEDclick(i, j) {
       socket.disconnect();
     }
 
+	function animate() {
+		animate_slot = 0;
+		old_slot = save_slot;
+		var i;
+		for(i = 1; i <= 3; i++) {
+			setTimeout(function () {
+				animate_frame();
+			}, i*1000);
+		}
+		setTimeout(function () {
+			revert_frame();
+		}, i*1000);
+	}
+
+
+	function animate_frame() {
+		animate_slot++;
+		save_slot = animate_slot;
+		load();
+	}
+	
+	function revert_frame() {;
+		save_slot = old_slot;
+		load();
+	}
+
 	function save() {
 		save_string = "";
 		for(var i = 0; i < disp.length; i++ ) {
 			save_string = save_string + disp[i].toString(16) + " ";
 		}
 		save_string = save_string.substring(0, save_string.length-1);
-		
-		socket.emit("save", {save_string: save_string});
+		socket.emit("save", {save_string: save_string, save_slot: save_slot});
 	}
 	
 	function load() {
-		socket.emit("load", "Send file");
+		socket.emit("load", {save_slot: save_slot});
 	}
 
     // When new data arrives, convert it and display it.
@@ -108,7 +146,7 @@ function LEDclick(i, j) {
                 //status_update("i2c: " + data);
         // Make data an array, each entry is a pair of digits
         data = data.split(" ");
-                status_update("data: " + data);
+                //status_update("data: " + data);
         // Every other pair of digits are Green. The others are red.
         // Ignore the red.
         // Convert from hex.
